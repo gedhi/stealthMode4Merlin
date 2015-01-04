@@ -8,17 +8,15 @@
 # Version: 1.0 "Sunset"
 # Author : Monter (http://monter.techlog.pl)
 #
-
 # this makes you put and call script where / how you want
 dir=`/bin/echo $( cd "$(/usr/bin/dirname "$0")" ; /bin/pwd -P )`
 stms=`/usr/bin/basename ${0}`
-
 # firmware check
 IFMERLIN=`/bin/cat /etc/motd | /bin/grep "ASUSWRT-Merlin" | /usr/bin/wc -l`
-
+# detect path to nvram
+NVRAM=$(which nvram)
 # LEDs status
-ISLEDSON=`/bin/nvram get led_disable`
-
+ISLEDSON=`$NVRAM get led_disable`
 # Go!
 if /usr/bin/[ "$IFMERLIN" = "1" ]; then
 
@@ -26,7 +24,7 @@ if /usr/bin/[ "$IFMERLIN" = "1" ]; then
         on)
             if /usr/bin/[ "$ISLEDSON" = "0" ]; then
               /usr/bin/logger -p6 -s -t stealthMode Activated
-              /bin/nvram set led_disable=1
+              $NVRAM set led_disable=1
               /sbin/service restart_leds > /dev/null 2>&1
             else
               /usr/bin/logger -p6 -s -t stealthMode It\'s currently enabled!
@@ -121,7 +119,7 @@ if /usr/bin/[ "$IFMERLIN" = "1" ]; then
             /usr/bin/logger -p6 -s -t stealthMode Complete shutdown and delete all jobs from Crontab - done
         ;;
         off)
-            /bin/nvram set led_disable=0
+            $NVRAM set led_disable=0
             /sbin/service restart_leds > /dev/null 2>&1
             /usr/bin/logger -p6 -s -t stealthMode Disactivated
         ;;
